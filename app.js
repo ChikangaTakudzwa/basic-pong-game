@@ -35,6 +35,13 @@ class Ball extends Rect {
   }
 }
 
+class Player extends Rect {
+  constructor() {
+    super(20, 100);
+    this.score = 0;
+  }
+}
+
 class Pong {
   constructor(canvas) {
     this._canvas = canvas;
@@ -46,6 +53,15 @@ class Pong {
 
     this.ball.vel.x = 100;
     this.ball.vel.y = 100;
+
+    this.players = [new Player(), new Player()];
+
+    this.players[0].pos.x = 40;
+    this.players[1].pos.x = this._canvas.width - 40;
+
+    this.players.forEach((player) => {
+      player.pos.y = this._canvas.height / 2;
+    });
 
     let lastTime;
 
@@ -61,16 +77,28 @@ class Pong {
     callback();
   }
 
+  collide(player, ball) {
+    if (
+      player.left < ball.right &&
+      player.right > ball.left &&
+      player.top < ball.bottom &&
+      player.bottom > ball.top
+    ) {
+      ball.vel.x = -ball.vel.x;
+    }
+  }
+
   draw() {
     this._context.fillStyle = '#000';
     this._context.fillRect(0, 0, this._canvas.width, this._canvas.height);
 
     this.drawRect(this.ball);
+    this.players.forEach((player) => this.drawRect(player));
   }
 
   drawRect(rect) {
     this._context.fillStyle = '#fff';
-    this._context.fillRect(rect.pos.x, rect.pos.y, rect.size.x, rect.size.y);
+    this._context.fillRect(rect.left, rect.top, rect.size.x, rect.size.y);
   }
 
   update(deltaTime) {
@@ -84,10 +112,15 @@ class Pong {
     if (this.ball.top < 0 || this.ball.bottom > this._canvas.height) {
       this.ball.vel.y = -this.ball.vel.y;
     }
+    this.players[1].pos.y = this.ball.pos.y;
+    this.players.forEach((player) => this.collide(player, this.ball));
     this.draw();
   }
 }
 
 const canvas = document.getElementById('pong');
-
 const pong = new Pong(canvas);
+
+canvas.addEventListener('mousemove', (event) => {
+  pong.players[0].pos.y = event.offsetY;
+});
