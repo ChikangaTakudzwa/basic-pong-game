@@ -1,6 +1,3 @@
-const canvas = document.getElementById('pong');
-const context = canvas.getContext('2d');
-
 class Vec {
   constructor(x = 0, y = 0) {
     this.x = x;
@@ -13,6 +10,22 @@ class Rect {
     this.pos = new Vec();
     this.size = new Vec(w, h);
   }
+
+  get left() {
+    return this.pos.x - this.size.x / 2;
+  }
+
+  get right() {
+    return this.pos.x + this.size.x / 2;
+  }
+
+  get top() {
+    return this.pos.y - this.size.y / 2;
+  }
+
+  get bottom() {
+    return this.pos.y + this.size.y / 2;
+  }
 }
 
 class Ball extends Rect {
@@ -22,43 +35,59 @@ class Ball extends Rect {
   }
 }
 
-const ball = new Ball();
-ball.pos.x = 100;
-ball.pos.y = 50;
-console.log(ball);
+class Pong {
+  constructor(canvas) {
+    this._canvas = canvas;
+    this._context = canvas.getContext('2d');
 
-ball.vel.x = 100;
-ball.vel.y = 100;
+    this.ball = new Ball();
+    this.ball.pos.x = 100;
+    this.ball.pos.y = 50;
 
-let lastTime;
+    this.ball.vel.x = 100;
+    this.ball.vel.y = 100;
 
-function callback(ms) {
-  if (lastTime) {
-    update((ms - lastTime) / 1000);
+    let lastTime;
+
+    const callback = (ms) => {
+      if (lastTime) {
+        this.update((ms - lastTime) / 1000);
+      }
+
+      lastTime = ms;
+
+      requestAnimationFrame(callback);
+    };
+    callback();
   }
 
-  lastTime = ms;
+  draw() {
+    this._context.fillStyle = '#000';
+    this._context.fillRect(0, 0, this._canvas.width, this._canvas.height);
 
-  requestAnimationFrame(callback);
+    this.drawRect(this.ball);
+  }
+
+  drawRect(rect) {
+    this._context.fillStyle = '#fff';
+    this._context.fillRect(rect.pos.x, rect.pos.y, rect.size.x, rect.size.y);
+  }
+
+  update(deltaTime) {
+    this.ball.pos.x += this.ball.vel.x * deltaTime;
+    this.ball.pos.y += this.ball.vel.y * deltaTime;
+
+    if (this.ball.left < 0 || this.ball.right > this._canvas.width) {
+      this.ball.vel.x = -this.ball.vel.x;
+    }
+
+    if (this.ball.top < 0 || this.ball.bottom > this._canvas.height) {
+      this.ball.vel.y = -this.ball.vel.y;
+    }
+    this.draw();
+  }
 }
 
-function update(deltaTime) {
-  ball.pos.x += ball.vel.x * deltaTime;
-  ball.pos.y += ball.vel.y * deltaTime;
+const canvas = document.getElementById('pong');
 
-  if (ball.pos.x < 0 || ball.pos.x > canvas.width) {
-    ball.vel.x = -ball.vel.x;
-  }
-
-  if (ball.pos.y < 0 || ball.pos.y > canvas.height) {
-    ball.vel.y = -ball.vel.y;
-  }
-
-  context.fillStyle = '#000';
-  context.fillRect(0, 0, canvas.width, canvas.height);
-
-  context.fillStyle = '#fff';
-  context.fillRect(ball.pos.x, ball.pos.y, ball.size.x, ball.size.y);
-}
-
-callback();
+const pong = new Pong(canvas);
