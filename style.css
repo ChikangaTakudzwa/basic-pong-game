@@ -13,3 +13,30 @@ canvas {
   image-rendering: pixelated;
   height: 100%;
 }
+
+.start {
+  position: fixed;
+  top: calc(100vh - 50%);
+  margin: auto;
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.start-contents {
+  display: flex;
+  flex-direction: column;
+}
+
+.start-contents p {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #fff;
+  text-align: center;
+  width: 100%;
+}
+
+button {
+  margin: 0 auto;
+}
