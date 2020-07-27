@@ -16,7 +16,7 @@ canvas {
 
 .start {
   position: fixed;
-  top: calc(100vh - 50%);
+  top: calc(100vh - 30%);
   margin: auto;
   display: flex;
   width: 100%;
@@ -28,6 +28,7 @@ canvas {
 .start-contents {
   display: flex;
   flex-direction: column;
+  justify-content: flex-end;
 }
 
 .start-contents p {
